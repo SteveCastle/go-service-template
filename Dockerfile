@@ -1,14 +1,13 @@
-FROM golang:1.8 as goimage
+FROM golang:latest as goimage
 ENV SRC=/go/src/
 RUN mkdir -p /go/src/
-WORKDIR /go/src/go_docker
-RUN git clone -b <Specify-branchname> — single-branch <Github HTTP Url> /go/src/go_docker/ \
-&& CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-go build -o bin/go_docker
-FROM alpine:3.6 as baseimagealp
-RUN apk add — no-cache bash
-ENV WORK_DIR=/docker/bin
-WORKDIR $WORK_DIR
-COPY — from=goimage /go/src/go_docker/bin/ ./
-ENTRYPOINT /docker/bin/go_docker
+WORKDIR /go/src/shrike
+RUN git clone -b master --single-branch https://github.com/SteveCastle/shrike.git /go/src/shrike/
+RUN go get github.com/labstack/echo && go get github.com/sirupsen/logrus && go get github.com/dgrijalva/jwt-go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+go build -v -o bin/shrike
+FROM alpine:latest
+WORKDIR /docker/bin
+COPY --from=goimage /go/src/shrike/bin/shrike /docker/bin/
+ENTRYPOINT ["/docker/bin/shrike"]
 EXPOSE 8080

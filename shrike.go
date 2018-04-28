@@ -23,10 +23,15 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// Routes
-	e.GET("/castle", signature)
+	e.GET("/", hello)
+	e.GET("/signature", signature)
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
+func hello(c echo.Context) error {
+	return c.JSON(http.StatusOK, "Hello world.")
+}
+
 func signature(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Hi this is Stephen Castle's cool web server.")
+	return c.JSON(http.StatusOK, "Hi this is my cool web server.")
 }

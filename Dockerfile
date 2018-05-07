@@ -10,4 +10,4 @@ FROM alpine:latest
 WORKDIR /docker/bin
 COPY --from=goimage /go/src/shrike/bin/shrike /docker/bin/
 ENTRYPOINT ["/docker/bin/shrike"]
-EXPOSE 8080
+EXPOSE 1323

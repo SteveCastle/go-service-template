@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	upgrader = websocket.Upgrader{}
+)
 var log = logrus.New()
 
 func init() {
@@ -23,15 +27,35 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// Routes
-	e.GET("/", hello)
+	e.File("/", "static/index.html")
 	e.GET("/signature", signature)
-	e.Logger.Fatal(e.Start(":8080"))
-}
-
-func hello(c echo.Context) error {
-	return c.JSON(http.StatusOK, "Hello world.")
+	e.GET("/ws", live)
+	e.Logger.Fatal(e.Start(":1323"))
 }
 
 func signature(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Hi this is my cool web server.")
+}
+
+func live(c echo.Context) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		return err
+	}
+	defer ws.Close()
+
+	for {
+		// Write
+		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+		if err != nil {
+			c.Logger().Error(err)
+		}
+
+		// Read
+		_, msg, err := ws.ReadMessage()
+		if err != nil {
+			c.Logger().Error(err)
+		}
+		fmt.Printf("%s\n", msg)
+	}
 }

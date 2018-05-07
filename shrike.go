@@ -33,6 +33,7 @@ func main() {
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
+// Controllers
 func signature(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Hi this is my cool web server.")
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
@@ -11,8 +12,8 @@ import (
 
 var (
 	upgrader = websocket.Upgrader{}
-	log      = logrus.New()
 )
+var log = logrus.New()
 
 func init() {
 	log.Formatter = new(logrus.JSONFormatter)
@@ -26,13 +27,17 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	// Routes
-	e.GET("/ws", live)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.File("/", "static/index.html")
+	e.GET("/about", about)
+	e.GET("/ws", webSocketHandler)
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
-// Controllers
+func about(c echo.Context) error {
+	return c.JSON(http.StatusOK, "Hi this is my cool web server.")
+}
 
-func live(c echo.Context) error {
+func webSocketHandler(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return err

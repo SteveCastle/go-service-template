@@ -9,18 +9,20 @@
 <body>
   <p id="output"></p>
 
-  <script>
-  var loc = window.location;
-var uri = 'ws:';
+<script>
+//Test http endpoint.
+fetch('/about')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+  });
 
-if (loc.protocol === 'https:') {
-  uri = 'wss:';
-}
-uri += '//' + loc.host;
-uri += loc.pathname + 'ws';
-
+// Test websocket endpoint.
+const loc = window.location;
+const uri = `ws://localhost:8080/ws`;
 ws = new WebSocket(uri);
-
 ws.onopen = function() {
   console.log('Connected');
 };

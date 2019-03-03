@@ -1,4 +1,4 @@
-# Shrike Micro-service Framework
+# Shrike Micro-service Starter
 
 ## Description
 
